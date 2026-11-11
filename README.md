@@ -6,14 +6,57 @@ A lab is not a static explainer page. It works like a PhET simulation: the learn
 
 ## Install
 
-In Claude Code:
+In Claude Code, add the marketplace and install the plugin in one step:
+
+```
+/plugin install interactive-concept-lab --marketplace mgonday/interactive-concept-lab
+```
+
+Or do it in two steps:
 
 ```
 /plugin marketplace add mgonday/interactive-concept-lab
 /plugin install interactive-concept-lab@mattias-plugins
 ```
 
-The skill is available as `interactive-concept-lab:interactive-concept-lab`.
+From a shell, use `claude plugin marketplace add mgonday/interactive-concept-lab` and `claude plugin install interactive-concept-lab@mattias-plugins`. Add `--scope user|project|local` to choose where the plugin is installed. The default is `user`.
+
+Claude invokes the skill automatically when your request matches it. You can also call it directly as `/interactive-concept-lab:interactive-concept-lab`.
+
+### Update
+
+Third-party marketplaces don't auto-update by default. To update the plugin:
+
+```sh
+claude plugin update interactive-concept-lab@mattias-plugins
+```
+
+Or open `/plugin` and choose **Update now** on the Installed tab. To get updates automatically, open `/plugin` and choose **Enable auto-update** for `mattias-plugins` on the Marketplaces tab.
+
+### Team setup
+
+To recommend the plugin to everyone working in a repository, run this in that repository and commit the `.claude/settings.json` it writes:
+
+```sh
+claude plugin marketplace add mgonday/interactive-concept-lab --scope project
+```
+
+To also enable the plugin for the project, add `enabledPlugins` so the file looks like this:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "mattias-plugins": {
+      "source": { "source": "github", "repo": "mgonday/interactive-concept-lab" }
+    }
+  },
+  "enabledPlugins": {
+    "interactive-concept-lab@mattias-plugins": true
+  }
+}
+```
+
+`enabledPlugins` doesn't install anything. Each contributor still runs `claude plugin install interactive-concept-lab@mattias-plugins --scope project` once per clone.
 
 ## Usage
 
@@ -72,4 +115,4 @@ claude plugin validate .
 claude plugin validate plugins/interactive-concept-lab
 ```
 
-To release a change, bump `version` in `plugins/interactive-concept-lab/.claude-plugin/plugin.json` and push. Users can pick up the change with `/plugin marketplace update mattias-plugins`.
+To release a change, bump `version` in `plugins/interactive-concept-lab/.claude-plugin/plugin.json` and push. Users only receive a new copy when the version changes, so commits pushed without a bump don't reach them. Don't also set `version` in the marketplace entry.
