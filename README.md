@@ -100,19 +100,46 @@ plugins/interactive-concept-lab/
         └── validate-project.sh          # install, type-check, test, build a lab
 ```
 
-## Development
+## Updating the plugin
 
-Test local changes without installing:
+Edit the source in this repository. Don't edit the installed copy under `~/.claude/plugins/`: it's a cache, and the next update overwrites it.
+
+### 1. Edit the skill
+
+The skill lives in `plugins/interactive-concept-lab/skills/interactive-concept-lab/`.
+
+### 2. Test locally (optional)
 
 ```sh
 claude --plugin-dir ./plugins/interactive-concept-lab
 ```
 
-Validate the manifests:
+This loads the plugin straight from your working copy for one session. Run `/reload-plugins` after further edits.
+
+### 3. Bump the version
+
+Change `version` in `plugins/interactive-concept-lab/.claude-plugin/plugin.json`:
+
+- patch (`1.0.0` → `1.0.1`) for fixes and wording tweaks
+- minor (`1.0.0` → `1.1.0`) for new behaviour or references
+- major (`1.0.0` → `2.0.0`) for changes that alter how the skill is used
+
+Installed copies only update when the version changes, so commits pushed without a bump don't reach users. Don't also set `version` in the marketplace entry.
+
+### 4. Validate, commit and push
 
 ```sh
 claude plugin validate .
 claude plugin validate plugins/interactive-concept-lab
+git add -A
+git commit -m "Describe the change"
+git push
 ```
 
-To release a change, bump `version` in `plugins/interactive-concept-lab/.claude-plugin/plugin.json` and push. Users only receive a new copy when the version changes, so commits pushed without a bump don't reach them. Don't also set `version` in the marketplace entry.
+### 5. Update the installed copy
+
+```sh
+claude plugin update interactive-concept-lab@mattias-plugins
+```
+
+Then run `/reload-plugins` in any open session. Other users run the same command, or enable auto-update in `/plugin` → Marketplaces.
