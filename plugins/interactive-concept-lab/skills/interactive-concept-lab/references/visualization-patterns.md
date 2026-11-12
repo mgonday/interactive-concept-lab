@@ -18,11 +18,14 @@ Pick the simplest representation that keeps the concept's structure visible. A d
 
 Many concepts are understood through a difference: before vs after, on vs off, expected vs actual. Show both side by side or as an overlay, so the learner does not have to remember one state while looking at the other.
 
-## When WebGL earns its place
+## Choosing the renderer
 
-- Hundreds or more elements updating per frame: instanced quads in WebGL2.
-- Real 3D, fields, surfaces, particles: Three.js / React Three Fiber.
-- Smooth scrubbing through time over a large state.
+Default to Canvas 2D. It handles graphs, timelines, node-edge views, and a few thousand shapes per frame.
+
+WebGL earns its place only when Canvas 2D can't do the job:
+
+- Thousands of elements updating per frame, or smooth scrubbing over a large state, where Canvas 2D drops frames: instanced quads in raw WebGL2.
+- Real 3D, fields, surfaces, particles: plain Three.js.
 
 Text, labels, tooltips and controls stay in the DOM, layered over the canvas.
 

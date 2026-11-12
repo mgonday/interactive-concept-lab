@@ -1,6 +1,6 @@
 {
   "name": "interactive-concept-lab",
-  "version": "1.1.0",
-  "description": "Builds runnable React + WebGL labs that teach a concept through experiments the learner runs.",
+  "version": "1.2.0",
+  "description": "Builds runnable Preact + TypeScript labs that teach a concept through experiments the learner runs, and ship as one self-contained HTML file.",
   "author": { "name": "Mattias Gonday" }
 }

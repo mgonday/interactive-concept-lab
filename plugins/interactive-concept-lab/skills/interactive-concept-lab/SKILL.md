@@ -1,6 +1,6 @@
 ---
 name: interactive-concept-lab
-description: Builds a runnable React + WebGL app that teaches one concept through experiments the learner runs. Use when the user asks for an interactive app, simulation, explorer, or playground to understand a concept, either a mechanism in the codebase they are working in or a general topic.
+description: Builds a runnable Preact + TypeScript app (Canvas, WebGL or Three.js views) that teaches one concept through experiments the learner runs. Use when the user asks for an interactive app, simulation, explorer, or playground to understand a concept, either a mechanism in the codebase they are working in or a general topic.
 ---
 
 # Interactive Concept Lab
@@ -9,8 +9,8 @@ The deliverable is a **lab**, not a page: a small app where the learner tweaks t
 
 A lab has three separate parts:
 
-1. **Model**: plain TypeScript with no React or WebGL imports. Deterministic, resettable, testable headless. It is the single source of truth for behaviour.
-2. **Views**: render the model's state. WebGL wherever it carries information (many objects, space, time, fields). Ordinary DOM for text and controls.
+1. **Model**: plain TypeScript with no Preact, Canvas or WebGL imports. Deterministic, resettable, testable headless. It is the single source of truth for behaviour.
+2. **Views**: render the model's state. Canvas 2D for most visuals, WebGL only where Canvas 2D can't keep up or the concept is truly 3D. Ordinary DOM for text and controls.
 3. **Learning layer**: objectives, guided "try this" experiments, presets, explanations tied to what is on screen, and callouts for notable states the learner reaches on their own.
 
 ## Steps
@@ -39,7 +39,9 @@ Sketch the screen in `CONCEPT.md`: the main view, the controls, the guide panel,
 
 ### 3. Build the model and prove it
 
-Scaffold a sibling project: `~/GitProjects/<slug>-explorer/` by default, never inside the repo being explained. Use Vite + React + TypeScript and give the dev server a fixed port with `strictPort: true`. The user runs it with `npm install && npm run dev`, so a bare `index.html` is not a deliverable.
+Scaffold a sibling project: `~/GitProjects/<slug>-explorer/` by default, never inside the repo being explained. Start from `npm create vite@latest <slug>-explorer -- --template preact-ts`, add Vitest, and give the dev server a fixed port with `strictPort: true`.
+
+Add `vite-plugin-singlefile` to `vite.config.ts` so `npm run build` writes one self-contained `dist/index.html` with all JS and CSS inlined. The user develops with `npm install && npm run dev` and shares the built file, which opens by double-click with no server or network. A hand-written `index.html` is not a deliverable: the Vite project is the source, and the single file is its build output.
 
 Write the model in `src/model/` and its tests (Vitest) before any view. The tests pin the behaviour the guide and callouts will point out: if a guided step says "the snippet snaps back", a test asserts it, and every notable-state predicate has a test that reaches it.
 
@@ -49,11 +51,13 @@ Write the model in `src/model/` and its tests (Vitest) before any view. The test
 
 Default stack:
 
-- WebGL: Three.js through React Three Fiber + Drei for 3D or spatial scenes; raw WebGL2 with instancing for dense 2D (timelines, grids, thousands of elements), as `ghosting-explorer/src/gl.ts` does.
-- State: Zustand (or a small store) holding the model instance. Views subscribe and never mutate the model directly.
-- Styling: plain CSS or Tailwind, whichever is quicker.
+- UI: Preact with `@preact/signals` for the controls, guide panel, and explanations.
+- State: a small store module (`src/store.ts`, no state library) that owns the model instance. Actions call the model, then update signals. Views read signals and never mutate the model directly.
+- 2D views: Canvas 2D. Switch to raw WebGL2 with instancing only when thousands of elements per frame make Canvas 2D drop frames, as `ghosting-explorer/src/gl.ts` does.
+- 3D views: plain Three.js (with `three/addons` such as `OrbitControls`), only when the concept has real space. Mount it on a canvas ref in an effect and dispose of it on unmount.
+- Styling: plain CSS.
 
-Add a dependency only when it removes real work. Give each view a WebGL-unavailable fallback message, keyboard-reachable controls with labels, and `prefers-reduced-motion` support.
+Add a dependency only when it removes real work. The built file must run from `file://` with no network, so import data and assets from `src/` into the bundle instead of fetching them at runtime or putting them in `public/`, and load nothing from a CDN. Delete the template's demo files in `public/` and `src/assets/`. Give each WebGL view an unavailable-fallback message, and make every control keyboard-reachable and labelled, with `prefers-reduced-motion` support.
 
 Explanations quote the live state ("lane 2 now has 3 ghost snippets because…"), not static prose.
 
@@ -61,7 +65,7 @@ Explanations quote the live state ("lane 2 now has 3 ghost snippets because…")
 
 ### 5. Verify
 
-Run `scripts/validate-project.sh <project-dir>` from this skill's folder. It installs, type-checks, tests, and builds.
+Run `scripts/validate-project.sh <project-dir>` from this skill's folder. It installs, type-checks, tests, builds, and checks that `dist/index.html` is self-contained.
 
 Then smoke-test the dev server. A Vite server started from a background shell exits when stdin closes, so start it as `tail -f /dev/null | npx vite`. Confirm the page returns 200 and the main modules load.
 
@@ -69,4 +73,4 @@ Then smoke-test the dev server. A Vite server started from a background shell ex
 
 ### 6. Hand over
 
-Write a short `README.md`: what the lab models (with source links when it comes from code), how to run it, the file map, and the simplifications. Tell the user the URL, the objectives, and one experiment to try first.
+Write a short `README.md`: what the lab models (with source links when it comes from code), how to run it, how to share it (`npm run build`, then send `dist/index.html`), the file map, and the simplifications. Tell the user the dev URL, the path to the built `dist/index.html`, the objectives, and one experiment to try first.

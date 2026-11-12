@@ -5,7 +5,7 @@
     {
       "name": "interactive-concept-lab",
       "source": "./plugins/interactive-concept-lab",
-      "description": "Builds runnable React + WebGL labs that teach a concept through experiments the learner runs."
+      "description": "Builds runnable Preact + TypeScript labs that teach a concept through experiments the learner runs, and ship as one self-contained HTML file."
     }
   ]
 }

@@ -1,8 +1,8 @@
 # interactive-concept-lab
 
-A Claude Code plugin that builds **interactive concept labs**: small, runnable React + WebGL apps that teach one concept through experiments the learner runs.
+A Claude Code plugin that builds **interactive concept labs**: small, runnable Preact + TypeScript apps that teach one concept through experiments the learner runs. Each lab also builds to a single HTML file you can share.
 
-A lab is not a static explainer page. It works like a PhET simulation: the learner changes the inputs to a faithful model of the concept, predicts what will happen, and checks whether they were right. The concept can be a mechanism in the codebase you're working in or a general topic.
+A lab is not a static explainer page. It works like a PhET simulation: the learner changes the inputs to a faithful model of the concept, tries guided experiments, and sees each result explained from the live state. There are no quizzes or right answers. The concept can be a mechanism in the codebase you're working in or a general topic.
 
 ## Install
 
@@ -69,19 +69,21 @@ Ask Claude for an interactive app, simulation, explorer, or playground to unders
 Claude then:
 
 1. **Pins down the concept.** It writes a `CONCEPT.md` with the learning objectives, the misconceptions to break, the variables and observables, and the model's simplifications. For codebase concepts, the model comes from the real source.
-2. **Designs the experiments and views.** It picks a visual representation that fits the concept and lays out a progression: engage → build intuition → explore → predict → explain → apply.
-3. **Builds and tests the model.** It writes plain TypeScript in `src/model/`, with Vitest tests that assert every challenge answer.
-4. **Builds the views and the learning layer.** WebGL is used where it carries information and DOM for text and controls. Predict-then-reveal challenges and the explanations quote the live state.
-5. **Verifies the project.** It installs, type-checks, tests, builds, and smoke-tests the dev server.
+2. **Designs the experiments and views.** It picks a visual representation that fits the concept and lays out a progression: hook → first tweak → guided experiments → free play → push it.
+3. **Builds and tests the model.** It writes plain TypeScript in `src/model/`, with Vitest tests that assert every result the guide explains.
+4. **Builds the views and the learning layer.** Canvas 2D draws most views, WebGL or Three.js only where they're needed, and the DOM holds text and controls. A guide suggests "try this" experiments, and its explanations quote the live state.
+5. **Verifies the project.** It installs, type-checks, tests, builds, checks that the build is one self-contained `dist/index.html`, and smoke-tests the dev server.
 6. **Hands over.** It writes a README for the lab and gives you the URL, the objectives, and one experiment to try first.
 
-The lab is created as a sibling project (`~/GitProjects/<slug>-explorer/` by default), never inside the repo being explained. To run it, use `npm install && npm run dev`.
+The lab is created as a sibling project (`~/GitProjects/<slug>-explorer/` by default), never inside the repo being explained. To run it, use `npm install && npm run dev`. To share it, run `npm run build` and send `dist/index.html`. It opens by double-click with no server or internet.
 
 ## Stack used in generated labs
 
-- Vite + React + TypeScript
-- Three.js via React Three Fiber + Drei for 3D or spatial scenes; raw WebGL2 with instancing for dense 2D views
-- Zustand (or a small store) for state
+- Vite + TypeScript, with `vite-plugin-singlefile` so the build is one self-contained `index.html`
+- Preact + `@preact/signals` for the UI
+- A small hand-written store for state (no state library)
+- Canvas 2D for views by default; raw WebGL2 with instancing only for very dense views; plain Three.js only for real 3D
+- Plain CSS
 - Vitest for model tests
 
 ## Repository layout
@@ -94,10 +96,10 @@ plugins/interactive-concept-lab/
     ├── SKILL.md                         # the skill's instructions
     ├── references/
     │   ├── codebase-concepts.md         # modelling concepts from real source code
-    │   ├── learning-design.md           # objectives, challenges, progression
+    │   ├── learning-design.md           # objectives, guided experiments, progression
     │   └── visualization-patterns.md    # choosing a representation
     └── scripts/
-        └── validate-project.sh          # install, type-check, test, build a lab
+        └── validate-project.sh          # install, type-check, test, build, check single-file output
 ```
 
 ## Updating the plugin
