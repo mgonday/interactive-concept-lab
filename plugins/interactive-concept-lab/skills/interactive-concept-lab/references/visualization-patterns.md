@@ -9,7 +9,7 @@ Pick the simplest representation that keeps the concept's structure visible. A d
 | Algorithm / state machine | Execution view with highlighted state | Step forwards and backwards, set breakpoints |
 | Data on a timeline (sequencer, events, scheduling) | 2D timeline with lanes | Drag, scrub, compare before/after |
 | Function of 1–2 parameters | Graph or surface | Move parameters, see the curve or surface change |
-| Probability | Repeated trials and a histogram | Run N trials, compare with the prediction |
+| Probability | Repeated trials and a histogram | Run N trials, compare with the expected distribution |
 | Network / dependency graph | Node-edge view | Add or cut edges, watch the propagation |
 | Concurrency (threads, queues, locks) | Swimlanes per thread with shared state between them | Change the interleaving, find the race |
 | Ownership / lifetime | Object graph with references and lifetimes | Drop a reference, watch what is freed |

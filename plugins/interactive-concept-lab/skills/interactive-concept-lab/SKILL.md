@@ -5,13 +5,13 @@ description: Builds a runnable React + WebGL app that teaches one concept throug
 
 # Interactive Concept Lab
 
-The deliverable is a **lab**, not a page: a small app where the learner changes the inputs to a faithful model of the concept, predicts what will happen, and sees whether they were right. It works like a PhET simulation (experiments first, visuals serving them), not like a museum installation. Every control, view, and animation earns its place by serving a learning objective.
+The deliverable is a **lab**, not a page: a small app where the learner tweaks the inputs to a faithful model of the concept, tries things, and watches what happens, with a guide suggesting experiments and explaining each result. It works like a PhET simulation (experiments first, visuals serving them), not like a museum installation or a quiz. The lab asks no questions and has no right or wrong answers. Every control, view, and animation earns its place by serving a learning objective.
 
 A lab has three separate parts:
 
 1. **Model**: plain TypeScript with no React or WebGL imports. Deterministic, resettable, testable headless. It is the single source of truth for behaviour.
 2. **Views**: render the model's state. WebGL wherever it carries information (many objects, space, time, fields). Ordinary DOM for text and controls.
-3. **Learning layer**: objectives, predict-then-reveal challenges, explanations tied to what is on screen, a transfer task.
+3. **Learning layer**: objectives, guided "try this" experiments, presets, explanations tied to what is on screen, and callouts for notable states the learner reaches on their own.
 
 ## Steps
 
@@ -21,28 +21,29 @@ If the concept lives in the current codebase, read [references/codebase-concepts
 
 Write `CONCEPT.md` in the new project with:
 
-- 3–5 learning objectives, each phrased as something the learner can *do* ("predict where a ghosted snippet lands after a copy-drag").
-- The misconceptions the lab must break, and what experiment breaks each one.
+- 3–5 learning objectives, each phrased as something the learner can *do* in the lab ("make a ghosted snippet land in another lane with a copy-drag").
+- The misconceptions the lab must break, and the experiment or preset that breaks each one.
+- The notable states worth pointing out when the learner reaches them (edge cases, thresholds), each with how the model detects it.
 - The variables the learner can change, and the observables they will watch.
 - Every simplification of the model, each with one line on why it does not mislead.
 
-**Done when** each objective names the experiment that exercises it and the challenge that checks it.
+**Done when** each objective names the guided experiment that exercises it.
 
 ### 2. Design the experiments and the views
 
-Read [references/visualization-patterns.md](references/visualization-patterns.md) and pick the representation from the concept's structure. Read [references/learning-design.md](references/learning-design.md) and lay out the progression: engage → build intuition → explore → predict → explain → apply.
+Read [references/visualization-patterns.md](references/visualization-patterns.md) and pick the representation from the concept's structure. Read [references/learning-design.md](references/learning-design.md) and lay out the progression: hook → first tweak → guided experiments → free play → push it.
 
-Sketch the screen in `CONCEPT.md`: the main view, the controls, the explanation panel, the challenge area.
+Sketch the screen in `CONCEPT.md`: the main view, the controls, the guide panel, the presets, and the explanation panel.
 
-**Done when** every control maps to a named model variable and every objective has at least one predict-then-reveal challenge.
+**Done when** every control maps to a named model variable and every objective has at least one guided experiment.
 
 ### 3. Build the model and prove it
 
 Scaffold a sibling project: `~/GitProjects/<slug>-explorer/` by default, never inside the repo being explained. Use Vite + React + TypeScript and give the dev server a fixed port with `strictPort: true`. The user runs it with `npm install && npm run dev`, so a bare `index.html` is not a deliverable.
 
-Write the model in `src/model/` and its tests (Vitest) before any view. The tests pin the behaviour each challenge will reveal: if a challenge says "the snippet snaps back", a test asserts it.
+Write the model in `src/model/` and its tests (Vitest) before any view. The tests pin the behaviour the guide and callouts will point out: if a guided step says "the snippet snaps back", a test asserts it, and every notable-state predicate has a test that reaches it.
 
-**Done when** `npm test` is green and every challenge answer is asserted by a test.
+**Done when** `npm test` is green and every result the guide explains is asserted by a test.
 
 ### 4. Build the views and the learning layer
 
